@@ -27,24 +27,13 @@
       description
         "Firewall module in progress.";
     }
-
-    //defines a new "Type" string type which limits the length
-    typedef DisplayString {
-      type string {
-        length "0 .. 255";
-      }
-      description
-        "YANG version of the SMIv2 DisplayString TEXTUAL-CONVENTION.";
-      reference
-        "RFC 2579, section 2.";
-
-    }
+    
     container rule {
       description
         "Top-level container for all firewall rules database objects.";
 
       leaf name {
-        type DisplayString;
+        type string;
         config false;
         mandatory false;
         description
@@ -52,7 +41,7 @@
       }
 
       leaf sourceMacAddress {
-        type DisplayString;
+        type string;
         config true;
         mandatory false;
         description
@@ -60,7 +49,7 @@
       }
 
       leaf destinationMacAddress {
-        type DisplayString;
+        type string;
         config true;
         mandatory false;
         description
@@ -69,7 +58,7 @@
 
 
       leaf sourceIpAddress {
-        type DisplayString;
+        type string;
         config true;
         mandatory false;
         description
@@ -77,7 +66,7 @@
       }
 
       leaf destinationIpAddress {
-        type DisplayString;
+        type string;
         config true;
         mandatory false;
         description
@@ -116,5 +105,20 @@
         config true;
         mandatory false;
       }
+      
+      leaf action {
+          type enumeration {
+            enum "block" {
+              value 1;
+            }
+            enum "allow" {
+              value 2;
+              description
+                "TCP protocol.";
+            }
+          }
+          config true;
+          mandatory false;
+        }
     }
 }
