@@ -1,2 +1,1 @@
-# odl-firewall
-SDN Firewall using Opendaylight controller
+# SDN Firewall using Opendaylight controller
