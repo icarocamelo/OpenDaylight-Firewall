@@ -1,0 +1,104 @@
+
+  module rule {
+
+    //The yang version - today only 1 version exists. If omitted defaults to 1.
+    yang-version 1; 
+
+    //a unique namespace for this toaster module, to uniquely identify it from other modules that may have the same name.
+    namespace
+      "http://netconfcentral.org/ns/fw"; 
+
+    //a shorter prefix that represents the namespace for references used below
+    prefix firewall;
+
+    //Defines the organization which defined / owns this .yang file.
+    organization "Netconf Central";
+
+    //defines the primary contact of this yang file.
+    contact
+      "Icaro Camelo <icamelo@inocybe.com>";
+
+    //provides a description of this .yang file.
+    description
+      "YANG version of the FIREWALL-MIB.";
+
+    //defines the dates of revisions for this yang file
+    revision "2015-09-04" {
+      description
+        "Firewall module in progress.";
+    }
+
+    //defines a new "Type" string type which limits the length
+    typedef DisplayString {
+      type string {
+        length "0 .. 255";
+      }
+      description
+        "YANG version of the SMIv2 DisplayString TEXTUAL-CONVENTION.";
+      reference
+        "RFC 2579, section 2.";
+
+    }
+    container rule {
+      description
+        "Top-level container for all firewall rules database objects.";
+
+      leaf name {
+        type DisplayString;
+        config false;
+        mandatory false;
+        description
+          "The name of firewall rule";
+      }
+
+      leaf sourceMacAddress {
+        type DisplayString;
+        config true;
+        mandatory false;
+        description
+          "The MAC address source";
+      }
+
+      leaf destinationMacAddress {
+        type DisplayString;
+        config true;
+        mandatory false;
+        description
+          "The MAC address destination";
+      }
+
+
+      leaf sourceIpAddress {
+        type DisplayString;
+        config true;
+        mandatory false;
+        description
+          "The IP address source";
+      }
+
+      leaf destinationIpAddress {
+        type DisplayString;
+        config true;
+        mandatory false;
+        description
+          "The IP address destination";
+      }
+
+      leaf protocol {
+        type enumeration {
+          enum "udp" {
+            value 1;
+            description
+              "UDP protocol.";
+          }
+          enum "tcp" {
+            value 2;
+            description
+              "TCP protocol.";
+          }
+        }
+        config true;
+        mandatory false;
+      }
+    }
+}
