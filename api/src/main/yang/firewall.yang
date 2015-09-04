@@ -83,6 +83,22 @@
         description
           "The IP address destination";
       }
+      
+      leaf sourcePort {
+          type uint32;
+          config true;
+          mandatory false;
+          description
+            "The source port";
+      }
+      
+      leaf destinationPort {
+          type uint32;
+          config true;
+          mandatory false;
+          description
+            "The destination port";
+      }
 
       leaf protocol {
         type enumeration {
