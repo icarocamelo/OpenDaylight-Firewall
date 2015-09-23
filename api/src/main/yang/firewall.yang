@@ -29,8 +29,6 @@
     }
     
     container rule {
-      description
-        "Top-level container for all firewall rules database objects.";
 
       leaf name {
         type string;
@@ -74,7 +72,7 @@
       }
       
       leaf sourcePort {
-          type uint32;
+          type uint16;
           config true;
           mandatory false;
           description
@@ -82,7 +80,7 @@
       }
       
       leaf destinationPort {
-          type uint32;
+          type uint16;
           config true;
           mandatory false;
           description
@@ -120,5 +118,12 @@
           config true;
           mandatory false;
         }
+    }
+  }
+    container firewall {
+    	list rule{
+    		key "id";
+    		uses rule;
+      }
     }
 }

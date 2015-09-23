@@ -25,8 +25,15 @@ public class FirewallModule extends org.opendaylight.yang.gen.v1.urn.opendayligh
 
     @Override
     public java.lang.AutoCloseable createInstance() {
-        FirewallProvider provider = new FirewallProvider();
+        final FirewallProvider provider = new FirewallProvider();
         getBrokerDependency().registerProvider(provider);
+
+        // final ListenerRegistration<DataChangeListener>
+        // dataChangeListenerRegistration = getBrokerDependency()
+        // .registerDataChangeListener(LogicalDatastoreType.CONFIGURATION,
+        // FirewallProvider.RULE_IID, provider,
+        // DataChangeScope.SUBTREE);
+
         return provider;
     }
 
