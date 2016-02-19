@@ -17,12 +17,14 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
       <modules xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
         <module>
-          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:firewall:impl">prefix:firewall</type>
-          <name>firewall-default</name>
-          <broker>
-            <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">binding:binding-broker-osgi-registry</type>
-            <name>binding-osgi-broker</name>
-          </broker>
+          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:firewall:impl">prefix:firewall-impl</type>
+          <name>firewall-impl</name>
+           <data-broker>
+            <type xmlns:binding="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">
+              binding:binding-async-data-broker
+            </type>
+            <name>binding-data-broker</name>
+          </data-broker>
         </module>
       </modules>
     </data>

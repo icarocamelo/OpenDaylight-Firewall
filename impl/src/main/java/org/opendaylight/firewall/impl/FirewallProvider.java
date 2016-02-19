@@ -9,28 +9,28 @@ package org.opendaylight.firewall.impl;
 
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
 import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.fw.rev150904.Rule;
+import org.opendaylight.yang.gen.v1.http.netconfcentral.org.ns.fw.rev150904.RuleBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 
 public class FirewallProvider implements BindingAwareProvider, AutoCloseable {
-
     public static final InstanceIdentifier<Rule> RULE_IID = InstanceIdentifier.builder(Rule.class).build();
     private static final Logger LOG = LoggerFactory.getLogger(FirewallProvider.class);
-    private DataBroker dataProvider;
+    private DataBroker dataBroker;
 
     @Override
     public void onSessionInitiated(ProviderContext session) {
         LOG.info("FirewallProvider Session Initiated");
+        initIntentsConfiguration();
+        initIntentsOperational();
     }
 
     @Override
@@ -38,47 +38,51 @@ public class FirewallProvider implements BindingAwareProvider, AutoCloseable {
         LOG.info("FirewallProvider Closed");
     }
 
-    public void apply() {
-        final WriteTransaction tx = dataProvider.newWriteOnlyTransaction();
-        // tx.put(LogicalDatastoreType.CONFIGURATION, buildRule());
+    /**
+     * Populates Intents' initial operational data into the MD-SAL operational
+     * data store.
+     */
+    protected void initIntentsOperational() {
+        // Build the initial intents operational data
+        Rule rules = new RuleBuilder().build();
 
-        final ListenableFuture<RpcResult<TransactionStatus>> commitFuture = tx.commit();
+        // Put the Intents operational data into the MD-SAL data store
+        WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.OPERATIONAL, RULE_IID, rules);
 
-        Futures.addCallback( commitFuture, new FutureCallback<RpcResult<TransactionStatus>>() {
+        // Perform the tx.submit asynchronously
+        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
+
             @Override
-            public void onSuccess( RpcResult<TransactionStatus> result ) {
-                if( result.getResult() != TransactionStatus.COMMITED )
-                    LOG.error("Failed to update rule: " + result.getErrors());
-
-                //                notifyCallback( result.getResult() == TransactionStatus.COMMITED );
+            public void onSuccess(final Void result) {
+                LOG.info("initIntentsOperational: transaction succeeded");
             }
 
             @Override
-            public void onFailure( Throwable t ) {
-                // We shouldn't get an OptimisticLockFailedException (or any ex) as no
-                // other component should be updating the operational state.
-                LOG.error("Failed to update rule", t);
-
-                //                notifyCallback( false );
+            public void onFailure(final Throwable throwable) {
+                LOG.error("initIntentsOperational: transaction failed");
             }
+        });
 
-            // void notifyCallback( boolean result ) {
-            // if( resultCallback != null )
-            // resultCallback.apply( result );
-            // }
-        } );
-
+        LOG.info("initIntentsOperational: operational status populated: {}", rules);
     }
+    
+    /**
+     * Populates Intents' default config data into the MD-SAL configuration data
+     * store. Note the database write to the tree are done in a synchronous
+     * fashion
+     */
+    protected void initIntentsConfiguration() {
+    	// Build the initial intents operational data
+        Rule rules = new RuleBuilder().build();
 
-    // private Rule buildRule(String name, String sourceMac, String
-    // destinationMac, String sourceIp, String destinationIp,
-    // int sourcePort, int destinationPort, Protocol protocol, Action action) {
-    // final Rule rule = new
-    // RuleBuilder().setName(name).setSourceMacAddress(sourceMac)
-    // .setDestinationMacAddress(destinationMac).setSourceIpAddress(destinationIp).setSourceIpAddress(sourceIp)
-    // .setSourcePort(sourcePort).setDestinationPort(destinationPort)
-    // .build();
-    // return rule;
-    // }
+        // Put the Intents operational data into the MD-SAL data store
+        WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
+        tx.put(LogicalDatastoreType.CONFIGURATION, RULE_IID, rules);
+        // Perform the tx.submit synchronously
+        tx.submit();
+
+        LOG.info("initIntentsConfiguration: default config populated: {}", rules);
+    }
 
 }

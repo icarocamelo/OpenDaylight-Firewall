@@ -19,14 +19,15 @@ module firewall-impl {
         config:java-name-prefix Firewall;
     }
 
+    // Augments the 'configuration' choice node under modules/module.
     augment "/config:modules/config:module/config:configuration" {
-        case firewall {
+        case firewall-impl {
             when "/config:modules/config:module/config:type = 'firewall'";
-            container broker {
+            container data-broker {
                 uses config:service-ref {
                     refine type {
                         mandatory true;
-                        config:required-identity md-sal-binding:binding-broker-osgi-registry;
+                        config:required-identity mdsal:binding-async-data-broker;
                     }
                 }
             }
